@@ -5,9 +5,9 @@
 Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
 int pin_sal = 5; // Pin I/O digital, Variable global
 const int AirValue = 20200;  // Medimos valor en seco
-const int WaterValue = 12650;  // Medimos valor en agua
+const int WaterValue = 10250;  // Medimos valor en agua
 const int NoSalineValue = 3111; //Valor de la medida del sensor en agua destilada sin nada
-const int MaxSalineValue = 20873; //Valor de la medida del sensor en agua destilada con la máxima cantidad de sal
+const int MaxSalineValue = 22873; //Valor de la medida del sensor en agua destilada con la máxima cantidad de sal
 const int H = 600; //constante que usaremos como margen de error para humedad
 const int S = 500; //constante que usaremos como margen de error para salinidad
 
@@ -73,12 +73,12 @@ void medirSalinidad(){
   if(adc1<(NoSalineValue - S) or adc1>(MaxSalineValue + S)){
     Serial.print("Error de lectura salinidad: ");
     Serial.print("La salinidad es: ");
-    Serial.println(salinidad);
+    Serial.print(salinidad);
     Serial.println(" %");
 
   } else {
     Serial.print("La salinidad es: ");
-    Serial.println(salinidad);
+    Serial.print(salinidad);
     Serial.println(" %");
   }
 
