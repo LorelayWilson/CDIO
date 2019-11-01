@@ -15,25 +15,31 @@ void setup() {
 
 //Función loop donde se llamará a las funciones de los sensores
 void loop() {
+
+  int AirValue = 20200;  // Medimos valor en seco
+  int WaterValue = 10250;  // Medimos valor en agua
+  int NoSalineValue = 3111; //Valor de la medida del sensor en agua destilada sin nada
+  int MaxSalineValue = 22873; //Valor de la medida del sensor en agua destilada con la máxima cantidad de sal
+  //Indicamos en que pin esta conectado el sensor de humedad y salinidad
+  int adcH = 0;
+  int adcS = 1;
+  int pin_sal = 5; // Pin I/O digital para salinidad
+  
   //Muestra los valores de salinidad y humedad en porcentaje llamando a las funciones creadas para ello
-  medirHumedad();
-  medirSalinidad();
+  medirHumedad(AirValue, WaterValue, adcH);
+  medirSalinidad(NoSalineValue, MaxSalineValue, adcS, pin_sal);
   Serial.println("");
   delay (5000);
 }
 
 //Función de humedad para calcular y mostrar por pantalla el porcentaje de humedad
-void medirHumedad(){
+void medirHumedad(AirValue, WaterValue, adcH){
 
-  int AirValue = 20200;  // Medimos valor en seco
-  int WaterValue = 10250;  // Medimos valor en agua
   int H = 600; //constante que usaremos como margen de error para humedad
   //Creamos las variables donde guardaremos el porcentaje de humedad y la lectura del sensor
-  int16_t humedad, adc0;
-  
+  int16_t humedad;
   //Guardamos el valor que mide el sensor de humedad que se comunica con el pin A0
-  adc0 = ads1115.readADC_SingleEnded(0);
-   
+  adc0 = ads1115.readADC_SingleEnded(adcH);
   //Guardamos en humedad el calculo del porcentaje
   humedad = 100*AirValue/(AirValue-WaterValue)-adc0*100/(AirValue-WaterValue);
 
@@ -49,20 +55,18 @@ void medirHumedad(){
     }
 }
 //Descripción de la función: muestra por pantalla el porcentaje de salinidad
-void medirSalinidad(){
+void medirSalinidad(NoSalineValue, MaxSalineValue, adcS, pin_sal){
 
-  int NoSalineValue = 3111; //Valor de la medida del sensor en agua destilada sin nada
-  int MaxSalineValue = 22873; //Valor de la medida del sensor en agua destilada con la máxima cantidad de sal
   int S = 500; //constante que usaremos como margen de error para salinidad
-  int pin_sal = 5; // Pin I/O digital
+
   //Creamos variables donde guardaremos el porcentaje de salinidad y la lectura del sensor
-  int16_t salinidad, adc1;
+  int16_t salinidad;
   
   digitalWrite( pin_sal, HIGH ); 
   delay(100); 
 
   //Guardamos el valor que mide el sensor de salinidad que se comunica con el pin A1
-  adc1 = ads1115.readADC_SingleEnded(1); 
+  adc1 = ads1115.readADC_SingleEnded(adcS); 
   digitalWrite( pin_sal, LOW ); 
   delay(10); 
 
