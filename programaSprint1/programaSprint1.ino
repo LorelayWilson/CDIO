@@ -6,9 +6,9 @@
 
 Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
 
-  //Indicamos en que pin esta conectado el sensor de humedad y salinidad
-  const int pin_sal = 5; // Pin I/O digital para salinidad
-  
+//Indicamos en que pin esta conectado el sensor de humedad y salinidad
+const int pin_sal = 5; // Pin I/O digital para salinidad
+
 //Función que se produce una sola vez para ajustar lo que necesitemos en el programa
 void setup() {
 
@@ -17,16 +17,16 @@ void setup() {
   ads1115.begin(); //Inicializamos el ADS1115
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
   EEPROM.begin(512);
-  for(int i = 0; i<= 511; i++){
+  for (int i = 0; i <= 511; i++) {
     EEPROM.write(i, 0);
     EEPROM.commit();
-    }
+  }
 }
 
 //Función loop donde se llamará a las funciones de los sensores
 void loop() {
 
-  
+
   int airValue = 20200;  // Medimos valor en seco
   int waterValue = 10250;  // Medimos valor en agua
   int noSalineValue = 3111; //Valor de la medida del sensor en agua destilada sin nada
@@ -38,7 +38,7 @@ void loop() {
   int adcH = 0;
   int adcS = 1;
   int adcT = 2;
-  
+
   //Muestra los valores de salinidad y humedad en porcentaje llamando a las funciones creadas para ello
   medirHumedad(airValue, waterValue, adcH);
   medirSalinidad(noSalineValue, maxSalineValue, adcS, pin_sal);
@@ -49,7 +49,7 @@ void loop() {
 }
 
 //Función de humedad para calcular y mostrar por pantalla el porcentaje de humedad
-void medirHumedad(int airValue, int waterValue, int adcH){
+void medirHumedad(int airValue, int waterValue, int adcH) {
 
   int H = 600; //constante que usaremos como margen de error para humedad
   //Creamos las variables donde guardaremos el porcentaje de humedad y la lectura del sensor
@@ -57,40 +57,40 @@ void medirHumedad(int airValue, int waterValue, int adcH){
   //Guardamos el valor que mide el sensor de humedad que se comunica con el pin A0
   adc0 = ads1115.readADC_SingleEnded(adcH);
   //Guardamos en humedad el calculo del porcentaje
-  humedad = 100*airValue/(airValue-waterValue)-adc0*100/(airValue-waterValue);
+  humedad = 100 * airValue / (airValue - waterValue) - adc0 * 100 / (airValue - waterValue);
 
   //Bucle que usamos para mandar mensaje de error si la lectura del adc0 no concuerda con la calibración
-  if(adc0<(waterValue - H) or adc0>(airValue + H)) {
+  if (adc0 < (waterValue - H) or adc0 > (airValue + H)) {
     Serial.print("Error lectura humedad: ");
     Serial.print(humedad);
     Serial.println("%");
-  } else{
+  } else {
     Serial.print("La humedad es: ");
     Serial.print(humedad);
     Serial.println("%");
-    }
+  }
 }
 //Descripción de la función: muestra por pantalla el porcentaje de salinidad
-void medirSalinidad(int noSalineValue, int maxSalineValue, int adcS, int pin_sal){
+void medirSalinidad(int noSalineValue, int maxSalineValue, int adcS, int pin_sal) {
 
   int S = 500; //constante que usaremos como margen de error para salinidad
 
   //Creamos variables donde guardaremos el porcentaje de salinidad y la lectura del sensor
   int16_t salinidad, adc1;
-  
-  digitalWrite( pin_sal, HIGH ); 
-  delay(100); 
+
+  digitalWrite( pin_sal, HIGH );
+  delay(100);
 
   //Guardamos el valor que mide el sensor de salinidad que se comunica con el pin A1
-  adc1 = ads1115.readADC_SingleEnded(adcS); 
-  digitalWrite( pin_sal, LOW ); 
-  delay(10); 
+  adc1 = ads1115.readADC_SingleEnded(adcS);
+  digitalWrite( pin_sal, LOW );
+  delay(10);
 
   //Aplicamos la siguiente fórmula para calcular el porcentaje de salinidad
-  salinidad = ((adc1 - noSalineValue)* 100)/(maxSalineValue - noSalineValue);
-  
+  salinidad = ((adc1 - noSalineValue) * 100) / (maxSalineValue - noSalineValue);
+
   //Filtramos los valores obtenidos del sensor para que ver si se encuentran dentro de los límites de la calibración
-  if(adc1<(noSalineValue - S) or adc1>(maxSalineValue + S)){
+  if (adc1 < (noSalineValue - S) or adc1 > (maxSalineValue + S)) {
     Serial.print("Error de lectura salinidad: ");
     Serial.print("La salinidad es: ");
     Serial.print(salinidad);
@@ -103,44 +103,55 @@ void medirSalinidad(int noSalineValue, int maxSalineValue, int adcS, int pin_sal
   }
 }
 
-void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int adcT){
-    
+void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int adcT) {
+
   //Creamos las variables donde guardaremos el porcentaje d y la lectura del sensor
   int16_t temperatura, adc2, voltaje;
-  
+
   //Guardamos el valor que mide el sensor de temperatura que se comunica con el pin A2
   adc2 = ads1115.readADC_SingleEnded(adcT);
 
-  voltaje = (4096/(pow(2,15)-1))*adc2;
-   
+  voltaje = (4096 / (pow(2, 15) - 1)) * adc2;
+
   //Guardamos en humedad el calculo del porcentaje
-  temperatura = (voltaje - ordenada_calibrado)/pendiente_calibrado;
+  temperatura = (voltaje - ordenada_calibrado) / pendiente_calibrado;
   Serial.print("Temperatura: ");
   Serial.println(temperatura);
 }
 
-void identificarPersonas (){
+void identificarPersonas () {
+  String nombres[] = {"Ivan", "Raul", "Ferran", "Lorena", "Asun", "Pepe"};
+  int i = 0, j = 0, t = 0;
+  String mensaje[] = {"Bienvenido/a, ", "Hasta luego, "};
+
   Serial.println("Introduzca su numero de identificacion");
-    while(Serial.available() == 0) {
-  long numero;
 
-  numero = Serial.parseInt();
+  if(Serial.available() > 1) {
+    int numero = Serial.parseInt();
 
+    Serial.print("Su numero de identificación es: ");
+    Serial.println(numero);
 
-  Serial.print("Su numero de identificación es: ");
-  Serial.println(numero);
-    }
-  /*  int numero = Serial.parseInt();
-    int i = 0;
-    
-    while(EEPROM.read(i) != 0){
+    while (EEPROM.read(i) != 0) {
       i++;
     }
-    
     EEPROM.write(i, numero);
     EEPROM.commit();
-    if (numero != 0){
-      Serial.print("Su numero de identificación es: ");
-      Serial.println(EEPROM.read(i));
-    }*/
+
+    for (int j = 0; j <= i; j++) {
+      if (EEPROM.read(j) == numero)
+        t++;
+    }
+    if (t % 2 != 0 && t != 0) {
+      Serial.print(mensaje[0]);
+      Serial.print(nombres[numero - 1]);
+      Serial.println(".");
+    }
+
+    if (t % 2 == 0 && t != 0) {
+      Serial.print(mensaje[1]);
+      Serial.print(nombres[numero - 1]);
+      Serial.println(".");
+    }
+  }
 }
