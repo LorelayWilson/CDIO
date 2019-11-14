@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <Adafruit_ADS1015.h>
 #include <math.h>
+#include <EEPROM.h>
 
 Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
 
@@ -15,13 +16,17 @@ void setup() {
   pinMode(pin_sal, OUTPUT); //Configuramos el pin 5 como salida
   ads1115.begin(); //Inicializamos el ADS1115
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
-
- 
+  EEPROM.begin(512);
+  for(int i = 0; i<= 511; i++){
+    EEPROM.write(i, 0);
+    EEPROM.commit();
+    }
 }
 
 //Función loop donde se llamará a las funciones de los sensores
 void loop() {
 
+  
   int airValue = 20200;  // Medimos valor en seco
   int waterValue = 10250;  // Medimos valor en agua
   int noSalineValue = 3111; //Valor de la medida del sensor en agua destilada sin nada
@@ -38,6 +43,7 @@ void loop() {
   medirHumedad(airValue, waterValue, adcH);
   medirSalinidad(noSalineValue, maxSalineValue, adcS, pin_sal);
   medirTemperatura(ordenada_calibrado, pendiente_calibrado, adcT);
+  identificarPersonas();
   Serial.println("");
   delay (5000);
 }
@@ -105,10 +111,36 @@ void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int adcT)
   //Guardamos el valor que mide el sensor de temperatura que se comunica con el pin A2
   adc2 = ads1115.readADC_SingleEnded(adcT);
 
-  voltaje = (4.096/(pow(2,15)-1))*adc2;
+  voltaje = (4096/(pow(2,15)-1))*adc2;
    
   //Guardamos en humedad el calculo del porcentaje
   temperatura = (voltaje - ordenada_calibrado)/pendiente_calibrado;
   Serial.print("Temperatura: ");
   Serial.println(temperatura);
+}
+
+void identificarPersonas (){
+  Serial.println("Introduzca su numero de identificacion");
+    while(Serial.available() == 0) {
+  long numero;
+
+  numero = Serial.parseInt();
+
+
+  Serial.print("Su numero de identificación es: ");
+  Serial.println(numero);
+    }
+  /*  int numero = Serial.parseInt();
+    int i = 0;
+    
+    while(EEPROM.read(i) != 0){
+      i++;
+    }
+    
+    EEPROM.write(i, numero);
+    EEPROM.commit();
+    if (numero != 0){
+      Serial.print("Su numero de identificación es: ");
+      Serial.println(EEPROM.read(i));
+    }*/
 }
