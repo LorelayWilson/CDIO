@@ -3,20 +3,21 @@
 #include <Adafruit_ADS1015.h>
 #include <math.h>
 #include <EEPROM.h>
+#include <Humedad.h>
+#include <Salinidad.h>
+#include <Temperatura.h>
 
 Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
-
-//Indicamos en que pin esta conectado el sensor de humedad y salinidad
-const int pin_sal = 5; // Pin I/O digital para salinidad
+bool flag = false;
 
 //Función que se produce una sola vez para ajustar lo que necesitemos en el programa
 void setup() {
 
   Serial.begin(9600); //Establecemos la velocidad de datos en 9600 baudios
-  pinMode(pin_sal, OUTPUT); //Configuramos el pin 5 como salida
   ads1115.begin(); //Inicializamos el ADS1115
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
   EEPROM.begin(512);
+  flag = true;
   for (int i = 0; i <= 511; i++) {
     EEPROM.write(i, 0);
     EEPROM.commit();
@@ -25,29 +26,59 @@ void setup() {
 
 //Función loop donde se llamará a las funciones de los sensores
 void loop() {
-
-
   int airValue = 20200;  // Medimos valor en seco
   int waterValue = 10250;  // Medimos valor en agua
   int noSalineValue = 3111; //Valor de la medida del sensor en agua destilada sin nada
   int maxSalineValue = 22873; //Valor de la medida del sensor en agua destilada con la máxima cantidad de sal
-  int ordenada_calibrado = 790;
-  int pendiente_calibrado = 34.9;
-
+  int ordenada  = 790;
+  int m = 34.9; //pendiente_calibrado
+  int pin_sal = 5; // Pin I/O digital para salinidad
 
   int adcH = 0;
   int adcS = 1;
   int adcT = 2;
 
-  //Muestra los valores de salinidad y humedad en porcentaje llamando a las funciones creadas para ello
-  medirHumedad(airValue, waterValue, adcH);
-  medirSalinidad(noSalineValue, maxSalineValue, adcS, pin_sal);
-  medirTemperatura(ordenada_calibrado, pendiente_calibrado, adcT);
+  char opc;
+
+  Humedad humedad(airValue, waterValue, adcH);
+  Salinidad salinidad(noSalineValue, maxSalineValue, adcS, pin_sal);
+  Temperatura temperatura(ordenada, m, adcT);
+
   identificarPersonas();
+
+  if (flag) {
+      Serial.println("Selecciona una opción:");
+      Serial.println("Temperatura (T)");
+      Serial.println("Humedad (H)");
+      Serial.println("Salinidad (S)");
+      flag = false;
+  }
+  if(Serial.available()){
+     opc = Serial.read();
+     if (opc != '\n' && opc != '\r') {
+        switch (opc) {
+          case 'T':
+            temperatura.mensaje(temperatura.getTemperatura());
+            break;
+          case 'S':
+            salinidad.mensajeError(salinidad.getSalinidad(), salinidad.leerADC());
+            break;
+          case 'H':
+            humedad.mensajeError(humedad.getHumedad());
+            break;
+          default:
+            Serial.println("Opción no válida");
+        }
+        flag = true;
+     }
+  }
+ 
+  
   Serial.println("");
   delay (5000);
 }
 
+/*
 //Función de humedad para calcular y mostrar por pantalla el porcentaje de humedad
 void medirHumedad(int airValue, int waterValue, int adcH) {
 
@@ -70,8 +101,10 @@ void medirHumedad(int airValue, int waterValue, int adcH) {
     Serial.println("%");
   }
 }
+
+
 //Descripción de la función: muestra por pantalla el porcentaje de salinidad
-void medirSalinidad(int noSalineValue, int maxSalineValue, int adcS, int pin_sal) {
+void medirSalinidad(int noSalineValue, int maxSalineValue, int adcS) {
 
   int S = 500; //constante que usaremos como margen de error para salinidad
 
@@ -103,6 +136,7 @@ void medirSalinidad(int noSalineValue, int maxSalineValue, int adcS, int pin_sal
   }
 }
 
+
 void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int adcT) {
 
   //Creamos las variables donde guardaremos el porcentaje d y la lectura del sensor
@@ -118,7 +152,7 @@ void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int adcT)
   Serial.print("Temperatura: ");
   Serial.println(temperatura);
 }
-
+*/
 void identificarPersonas () {
   String nombres[] = {"Ivan", "Raul", "Ferran", "Lorena", "Asun", "Pepe"};
   int i = 0, j = 0, t = 0;
@@ -126,7 +160,9 @@ void identificarPersonas () {
 
   Serial.println("Introduzca su numero de identificacion");
 
-  if(Serial.available() > 1) {
+  while(!Serial.available());
+  
+  if(Serial.available()) {
     int numero = Serial.parseInt();
 
     Serial.print("Su numero de identificación es: ");
