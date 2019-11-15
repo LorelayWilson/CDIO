@@ -3,17 +3,16 @@
 #include <Adafruit_ADS1015.h>
 #include <math.h>
 #include <EEPROM.h>
+#include <Humedad.h>
+#include <Salinidad.h>
+#include <Temperatura.h>
 
 Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
-
-//Indicamos en que pin esta conectado el sensor de humedad y salinidad
-const int pin_sal = 5; // Pin I/O digital para salinidad
 
 //Función que se produce una sola vez para ajustar lo que necesitemos en el programa
 void setup() {
 
   Serial.begin(9600); //Establecemos la velocidad de datos en 9600 baudios
-  pinMode(pin_sal, OUTPUT); //Configuramos el pin 5 como salida
   ads1115.begin(); //Inicializamos el ADS1115
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
   EEPROM.begin(512);
@@ -25,29 +24,37 @@ void setup() {
 
 //Función loop donde se llamará a las funciones de los sensores
 void loop() {
-
-
   int airValue = 20200;  // Medimos valor en seco
   int waterValue = 10250;  // Medimos valor en agua
   int noSalineValue = 3111; //Valor de la medida del sensor en agua destilada sin nada
   int maxSalineValue = 22873; //Valor de la medida del sensor en agua destilada con la máxima cantidad de sal
-  int ordenada_calibrado = 790;
-  int pendiente_calibrado = 34.9;
-
+  int ordenada  = 790;
+  int m = 34.9; //pendiente_calibrado
+  int pin_sal = 5; // Pin I/O digital para salinidad
 
   int adcH = 0;
   int adcS = 1;
   int adcT = 2;
 
-  //Muestra los valores de salinidad y humedad en porcentaje llamando a las funciones creadas para ello
-  medirHumedad(airValue, waterValue, adcH);
-  medirSalinidad(noSalineValue, maxSalineValue, adcS, pin_sal);
-  medirTemperatura(ordenada_calibrado, pendiente_calibrado, adcT);
+  Humedad humedad(airValue, waterValue, adcH);
+  Salinidad salinidad(noSalineValue, maxSalineValue, adcS, pin_sal);
+  Temperatura temperatura(ordenada, m, adcT);
+
   identificarPersonas();
+  if(mensaje=='T')
+      temperatura.mensaje(temperatura.getTemperatura());
+  else if(opc=='S')
+      salinidad.mensajeError(salinidad.getSalinidad(), salinidad.leerADC());
+  else if (opc=='H')
+      humedad.mensajeError(humedad.getHumedad());
+  else
+      Serial.println("Opción no válida");
+  
   Serial.println("");
   delay (5000);
 }
 
+/*
 //Función de humedad para calcular y mostrar por pantalla el porcentaje de humedad
 void medirHumedad(int airValue, int waterValue, int adcH) {
 
@@ -70,8 +77,10 @@ void medirHumedad(int airValue, int waterValue, int adcH) {
     Serial.println("%");
   }
 }
+
+
 //Descripción de la función: muestra por pantalla el porcentaje de salinidad
-void medirSalinidad(int noSalineValue, int maxSalineValue, int adcS, int pin_sal) {
+void medirSalinidad(int noSalineValue, int maxSalineValue, int adcS) {
 
   int S = 500; //constante que usaremos como margen de error para salinidad
 
@@ -103,6 +112,7 @@ void medirSalinidad(int noSalineValue, int maxSalineValue, int adcS, int pin_sal
   }
 }
 
+
 void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int adcT) {
 
   //Creamos las variables donde guardaremos el porcentaje d y la lectura del sensor
@@ -118,7 +128,7 @@ void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int adcT)
   Serial.print("Temperatura: ");
   Serial.println(temperatura);
 }
-
+*/
 void identificarPersonas () {
   String nombres[] = {"Ivan", "Raul", "Ferran", "Lorena", "Asun", "Pepe"};
   int i = 0, j = 0, t = 0;
