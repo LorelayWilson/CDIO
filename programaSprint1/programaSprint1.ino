@@ -8,6 +8,7 @@
 #include <Temperatura.h>
 
 Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
+bool flag = false;
 
 //Función que se produce una sola vez para ajustar lo que necesitemos en el programa
 void setup() {
@@ -16,6 +17,7 @@ void setup() {
   ads1115.begin(); //Inicializamos el ADS1115
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
   EEPROM.begin(512);
+  flag = true;
   for (int i = 0; i <= 511; i++) {
     EEPROM.write(i, 0);
     EEPROM.commit();
@@ -36,19 +38,41 @@ void loop() {
   int adcS = 1;
   int adcT = 2;
 
+  char opc;
+
   Humedad humedad(airValue, waterValue, adcH);
   Salinidad salinidad(noSalineValue, maxSalineValue, adcS, pin_sal);
   Temperatura temperatura(ordenada, m, adcT);
 
   identificarPersonas();
-  if(mensaje=='T')
-      temperatura.mensaje(temperatura.getTemperatura());
-  else if(opc=='S')
-      salinidad.mensajeError(salinidad.getSalinidad(), salinidad.leerADC());
-  else if (opc=='H')
-      humedad.mensajeError(humedad.getHumedad());
-  else
-      Serial.println("Opción no válida");
+
+  if (flag) {
+      Serial.println("Selecciona una opción:");
+      Serial.println("Temperatura (T)");
+      Serial.println("Humedad (H)");
+      Serial.println("Salinidad (S)");
+      flag = false;
+  }
+  if(Serial.available()){
+     opc = Serial.read();
+     if (opc != '\n' && opc != '\r') {
+        switch (opc) {
+          case 'T':
+            temperatura.mensaje(temperatura.getTemperatura());
+            break;
+          case 'S':
+            salinidad.mensajeError(salinidad.getSalinidad(), salinidad.leerADC());
+            break;
+          case 'H':
+            humedad.mensajeError(humedad.getHumedad());
+            break;
+          default:
+            Serial.println("Opción no válida");
+        }
+        flag = true;
+     }
+  }
+ 
   
   Serial.println("");
   delay (5000);
@@ -136,7 +160,9 @@ void identificarPersonas () {
 
   Serial.println("Introduzca su numero de identificacion");
 
-  if(Serial.available() > 1) {
+  while(!Serial.available());
+  
+  if(Serial.available()) {
     int numero = Serial.parseInt();
 
     Serial.print("Su numero de identificación es: ");
