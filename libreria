@@ -1,0 +1,21 @@
+#include "IdentificarPersonas.h"
+
+void inicializarMemoriaEEPROM(){
+	for(int i = 0; i <= 511; i++){
+		EEPROM.write(i,0);
+		EEPROM.commit();
+	}
+}
+
+
+void leerNumero(int numero) {
+		EEPROM.write(0,numero);
+		EEPROM.commit();
+		
+
+}
+
+//Función para mostrar por pantalla
+void mostrarNumero(){
+    Serial.println(EEPROM.read(0));
+}
