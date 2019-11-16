@@ -9,9 +9,7 @@ void setup()
 {
   Serial.begin(9600);
   EEPROM.begin(512);
-  if (comprobarInicializacion() == false) {
-    inicializarMemoriaEEPROM();
-  }
+
 }
 
 void loop()
@@ -20,7 +18,6 @@ void loop()
   Serial.println("Pulse 2 para comprobar el registro de trabajadores");
   Serial.println("Pulse 3 para borrar el registro actual");
   Serial.println("Pulse 4 para finalizar el programa");
-  Serial.println(" ");
   delay(5000);
 
   if (Serial.available() > 1) {
