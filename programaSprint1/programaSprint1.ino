@@ -8,7 +8,6 @@ int numero;
 int ultima_casilla;
 int menu;
 int multiplo = 1;
-
 bool flag = false;
 
 /****************************************************************************************************************************************
@@ -66,8 +65,8 @@ void sensores(){
 
 void menuSensores(){
   int16_t lectura;
-
-  if (flag) {
+ 
+  if(flag){
       Serial.println("Pulse 1 para identificarse");
       Serial.println("Pulse 2 para comprobar el registro de trabajadores");
       Serial.println("Pulse 3 para borrar el registro actual");
@@ -93,43 +92,45 @@ void menuSensores(){
             ultima_casilla = localizarUltimaCasilla();
             leerNumero(numero, ultima_casilla);
             mostrarNumero(ultima_casilla);
-            Serial.println(" ");
+            flag = true;
             break;
 
           case 2:
             Serial.print("El registro es: ");
             ultima_casilla = localizarUltimaCasilla();
             comprobarRegistro(ultima_casilla);
-            Serial.println(" ");
+            flag = true;
             break;
 
           case 3:
             inicializarMemoriaEEPROM();
             Serial.println("Memoria reiniciada");
-            Serial.println(" ");
+            flag = true;
             break;
           case 4:
             humedad.lecturaTemperatura();
-            Serial.println(" ");
+            flag = true;
             break;
           case 5:
             humedad.lecturaSalinidad();
-            Serial.println(" ");
+            flag = true;
             break;
           
           case 6:
             humedad.lecturaHumedad();
-            Serial.println(" ");
+            flag = true;
             break;
     
           case 7:
             Serial.println("El programa se detendrá");
-            Serial.println(" ");
             ESP.deepSleep(30000000);
+            flag = true;
             break;
-           
+          default:
+            Serial.println("Opcion no valida");
+            flag = true;
         }
-        flag = true;
+
      }
   }
 }
@@ -145,8 +146,8 @@ void setup() {
   ads1115.begin(); //Inicializamos el ADS1115
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
   EEPROM.begin(512);
-  sensores();
   flag = true;
+  sensores();
   if (comprobarInicializacion() == false) {
     inicializarMemoriaEEPROM();
   }
@@ -159,7 +160,6 @@ void setup() {
 void loop() {
 
   menuSensores();
-  Serial.println("");
   delay (5000);
 }
 
