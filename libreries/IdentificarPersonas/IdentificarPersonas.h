@@ -7,7 +7,7 @@
  
  
 #include <EEPROM.h>
- #include "Arduino.h"
+#include "Arduino.h"
 
  void inicializarMemoriaEEPROM();
  void leerNumero(int, int );

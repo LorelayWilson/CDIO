@@ -4,10 +4,8 @@
 #include "Sensor.h"
 #include "IdentificarPersonas.h"
 #include <EEPROM.h>
-int numero;
-int ultima_casilla;
-int menu;
-int multiplo = 1;
+#include <Adafruit_ADS1015.h>
+
 bool flag = false;
 
 /****************************************************************************************************************************************
@@ -19,60 +17,41 @@ bool flag = false;
  ****************************************************************************************************************************************/
 
   //CONSTANTES SENSOR HUMEDAD
-  const double MIN_HUMEDAD = 20200;  // Medimos valor minimo de humedad (valor en seco)
-  const double MAX_HUMEDAD = 10250;  // Medimos valor maximo de humedad (valor en agua)
-  const int adcH = 0;  // Pin de entrada analogica para sensor humedad
+  const double AIR_VALUE = 20200;  // Medimos valor minimo de humedad (valor en seco)
+  const double WATER_VALUE = 10250;  // Medimos valor maximo de humedad (valor en agua)
+  const int ADCH = 0;  // Pin de entrada analogica para sensor humedad
 
   //CONSTANTES SENSOR SALINIDAD
   const double MIN_SALINIDAD = 3111; //Valor de la medida del sensor en agua destilada sin nada
   const double MAX_SALINIDAD = 22873; //Valor de la medida del sensor en agua destilada con la máxima cantidad de sal
-  const int adcS = 1;  // Pin de entrada analogica para sensor salinidad
-  const int pin_sal = 5; // Pin I/O digital para salinidad
+  const int ADCS = 1;  // Pin de entrada analogica para sensor salinidad
+  const int PIN_SAL = 5; // Pin I/O digital para salinidad
   
   //CONSTANTES SENSOR TEMPERATURA
   const double B  = 790;  //ordenada en el origen
   const double M = 34.9; //  pendiente_calibrado
-  const int adcT = 2;  // Pin de entrada analogica para sensor temperatura
+  const int ADCT = 2;  // Pin de entrada analogica para sensor temperatura
   
-
-// Salinidad salinidad(noSalineValue, maxSalineValue, adcS, pin_sal);
-// Temperatura temperatura(ordenada, m, adcT);
-
-
-
+  Adafruit_ADS1115 ads1115(0x48);
 /****************************************************************************************************************************************
  *CREACION DE SENSORES
  ****************************************************************************************************************************************/
-
-Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
-Sensor humedad;
-Sensor salinidad;
-Sensor temperatura;
-
-void sensores(){
-  Sensor hum(adcH, MIN_HUMEDAD, MAX_HUMEDAD, ads1115);
-  Sensor sal(adcS, MIN_SALINIDAD, MAX_SALINIDAD, pin_sal, ads1115);
-  Sensor temp(adcT, M, B, ads1115);
-  humedad=hum;
-  salinidad = sal;
-  temperatura = temp;
-}
-
-
+// Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
+ 
 /****************************************************************************************************************************************
  *FUNCION MENU DEL PROGRAMA
  ****************************************************************************************************************************************/
 
 void menuSensores(){
+  int numero, ultima_casilla;
   int16_t lectura;
- 
   if(flag){
       Serial.println("Pulse 1 para identificarse");
       Serial.println("Pulse 2 para comprobar el registro de trabajadores");
       Serial.println("Pulse 3 para borrar el registro actual");
-      Serial.println("Pulse 4 para ver la Temperatura");
+      Serial.println("Pulse 4 para ver la Humedad");
       Serial.println("Pulse 5 para ver la Salinidad");
-      Serial.println("Pulse 6 para ver la Humedad");
+      Serial.println("Pulse 6 para ver la Temperatura");
       Serial.println("Pulse 7 para acabar su jornada");
       Serial.println("Pulse 8 para finalizar el programa");
       delay(5000);
@@ -110,16 +89,25 @@ void menuSensores(){
             flag = true;
             break;
           case 4:
-            humedad.lecturaTemperatura();
+            lectura = ads1115.readADC_SingleEnded(ADCH);
+            medirHumedad(AIR_VALUE, WATER_VALUE, lectura);
             flag = true;
             break;
           case 5:
-            humedad.lecturaSalinidad();
+            digitalWrite(PIN_SAL , HIGH);
+            delay(100);
+            
+            lectura = ads1115.readADC_SingleEnded(ADCS);
+            digitalWrite(PIN_SAL, LOW);
+            delay(10);
+            medirSalinidad(MIN_SALINIDAD, MAX_SALINIDAD, lectura);
             flag = true;
             break;
           
           case 6:
-            humedad.lecturaHumedad();
+            lectura = ads1115.readADC_SingleEnded(ADCT);
+
+            medirTemperatura(B, M, lectura);
             flag = true;
             break;
 
@@ -156,7 +144,6 @@ void setup() {
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
   EEPROM.begin(512);
   flag = true;
-  sensores();
   if (comprobarInicializacion() == false) {
     inicializarMemoriaEEPROM();
   }
