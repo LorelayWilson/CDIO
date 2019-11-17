@@ -24,9 +24,6 @@
     	Sensor(int, double, double, int, Adafruit_ADS1115);
     	void lecturaHumedad();
     	void lecturaSalinidad();
-    	void lecturaTemperatura();
-
-      
-  
+    	void lecturaTemperatura(); 
  };
  #endif

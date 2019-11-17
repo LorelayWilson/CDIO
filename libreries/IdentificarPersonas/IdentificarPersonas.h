@@ -10,10 +10,11 @@
  #include "Arduino.h"
 
  void inicializarMemoriaEEPROM();
- void leerNumero(int numero, int i);
- void mostrarNumero(int i);
+ void leerNumero(int, int );
+ void mostrarNumero(int);
  int localizarUltimaCasilla();
- void comprobarRegistro(int i);
+ void comprobarRegistro(int);
  bool comprobarInicializacion();
+ void mensaje(int, int);
  
  #endif

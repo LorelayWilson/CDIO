@@ -45,3 +45,12 @@ bool comprobarInicializacion(){
 	}
 	return false;
 }
+
+void mensaje(int i, int j){
+
+	  String nombres[] = {"Ivan", "Raul", "Ferran", "Lorena", "Asun", "Pepe"};
+	  String mensaje[] = {"Bienvenido/a, ", "Hasta luego, "};
+	  Serial.print(mensaje[j]);
+	  Serial.print(nombres[i]);
+	  Serial.println(".");
+}
