@@ -33,11 +33,8 @@ void medirSalinidad(int noSalineValue, int maxSalineValue, int16_t adc) {
 
   int S = 500; //constante que usaremos como margen de error para salinidad
 
-  //Creamos variables donde guardaremos el porcentaje de salinidad y la lectura del sensor
-  int16_t salinidad;
-
   //Aplicamos la siguiente fórmula para calcular el porcentaje de salinidad
-  salinidad = ((adc - noSalineValue) * 100) / (maxSalineValue - noSalineValue);
+  int16_t salinidad = ((adc - noSalineValue) * 100) / (maxSalineValue - noSalineValue);
 
   //Filtramos los valores obtenidos del sensor para que ver si se encuentran dentro de los límites de la calibración
   if (adc < (noSalineValue - S) or adc > (maxSalineValue + S)) {
@@ -56,15 +53,13 @@ void medirSalinidad(int noSalineValue, int maxSalineValue, int16_t adc) {
 
 void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int16_t adc) {
 
-  //Creamos las variables donde guardaremos el porcentaje d y la lectura del sensor
-  int16_t temperatura, voltaje;
-
   //Guardamos el valor que mide el sensor de temperatura que se comunica con el pin A2
 
-  voltaje = (4096 / (pow(2, 15) - 1)) * adc;
+  int16_t  voltaje = (4096 / (pow(2, 15) - 1)) * adc;
 
   //Guardamos en humedad el calculo del porcentaje
-  temperatura = (voltaje - ordenada_calibrado) / pendiente_calibrado;
+  int16_t  temperatura = (voltaje - ordenada_calibrado) / pendiente_calibrado;
+  
   Serial.print("Temperatura: ");
   Serial.println(temperatura);
 }

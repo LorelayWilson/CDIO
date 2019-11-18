@@ -6,8 +6,6 @@
 #include <EEPROM.h>
 #include <Adafruit_ADS1015.h>
 
-bool flag = false;
-
 /****************************************************************************************************************************************
  *********************************************************CONSTANTES DEL PROGRAMA********************************************************
  *                                                 Estos se deben cambiar según los valores
@@ -31,19 +29,21 @@ bool flag = false;
   const double B  = 790;  //ordenada en el origen
   const double M = 34.9; //  pendiente_calibrado
   const int ADCT = 2;  // Pin de entrada analogica para sensor temperatura
-  
-  Adafruit_ADS1115 ads1115(0x48);
-/****************************************************************************************************************************************
- *CREACION DE SENSORES
- ****************************************************************************************************************************************/
-// Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
- 
+
+  //CAMBIAR SEGUN LA DIRECCION DE MEMORIA QUE USAS
+  Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
+
+  //VARIABLES GLOBALES
+  bool flag = false;
 /****************************************************************************************************************************************
  *FUNCION MENU DEL PROGRAMA
  ****************************************************************************************************************************************/
 
 void menuSensores(){
+
+  //Numero sera el numero del personal. Ultima casilla sera la ultima posicion que esta vacia en la memoria EEPROM
   int numero, ultima_casilla;
+  //Se guardara la lectura de los sensores
   int16_t lectura;
   if(flag){
       Serial.println("Pulse 1 para identificarse");
@@ -62,7 +62,8 @@ void menuSensores(){
      if (opc >= '1' && opc <= '9')
       //restamos el valor '0' para obtener el numero enviado
         opc -= '0';
-
+        
+     //Quitamos los caracteres extra que se envian automaticamente en el monitor serie 
      if (opc != '\n' && opc != '\r') {
         switch (opc) {
          case 1:
@@ -96,7 +97,6 @@ void menuSensores(){
           case 5:
             digitalWrite(PIN_SAL , HIGH);
             delay(100);
-            
             lectura = ads1115.readADC_SingleEnded(ADCS);
             digitalWrite(PIN_SAL, LOW);
             delay(10);
@@ -106,7 +106,6 @@ void menuSensores(){
           
           case 6:
             lectura = ads1115.readADC_SingleEnded(ADCT);
-
             medirTemperatura(B, M, lectura);
             flag = true;
             break;
@@ -127,7 +126,6 @@ void menuSensores(){
             Serial.println("Opcion no valida");
             flag = true;
         }
-
      }
   }
 }
@@ -142,7 +140,7 @@ void setup() {
   Serial.begin(9600); //Establecemos la velocidad de datos en 9600 baudios
   ads1115.begin(); //Inicializamos el ADS1115
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
-  EEPROM.begin(512);
+  EEPROM.begin(512); //Inicializamos la memoria EEPROM
   flag = true;
   if (comprobarInicializacion() == false) {
     inicializarMemoriaEEPROM();
