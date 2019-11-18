@@ -23,9 +23,8 @@ void mostrarNumero(int i){
 //Calculamos cual es la ultima casilla sin utilizar
 int localizarUltimaCasilla(){
 	for(int i = 0; i <= 511; i++){
-		if(EEPROM.read(i) == 0){
+		if(EEPROM.read(i) == 0)
 			return i;
-		}
 	}
 }
 
@@ -39,18 +38,27 @@ void comprobarRegistro(int i){
 //Comprobamos si la memoria EEPROM ya ha sido inicializada
 bool comprobarInicializacion(){
 	for(int i = 0; i <= 511; i++){
-		if(EEPROM.read(i) == 0){
+		if(EEPROM.read(i) == 0)
 			return true;
-		}
 	}
 	return false;
 }
 
 void mensaje(int i, int j){
 
-	  String nombres[] = {"Ivan", "Raul", "Ferran", "Lorena", "Asun", "Pepe"};
-	  String mensaje[] = {"Bienvenido/a, ", "Hasta luego, "};
-	  Serial.print(mensaje[j]);
-	  Serial.print(nombres[i]);
-	  Serial.println(".");
+	String nombres[] = {"Ivan", "Raul", "Ferran", "Lorena", "Asun", "Pepe"};
+	String mensaje[] = {"Bienvenido/a, ", "Hasta luego, "};
+	
+	if(i<1 or i>6) //buscar algo parecido a nombres.length()
+
+		  Serial.println("Numero de identificacion erroneo.");
+ 	else {
+
+		Serial.print(mensaje[j]);
+		Serial.print(nombres[i]);
+		Serial.println(".");
+	}
+
+		
+
 }
