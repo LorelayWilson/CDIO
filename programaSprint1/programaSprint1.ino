@@ -42,7 +42,7 @@
 void menuSensores(){
 
   //Numero sera el numero del personal. Ultima casilla sera la ultima posicion que esta vacia en la memoria EEPROM
-  int numero, ultima_casilla,multiplo=1;
+  int numero, ultima_casilla,multiplo=1 ;
   //Se guardara la lectura de los sensores
   int16_t lectura;
   if(flag){
