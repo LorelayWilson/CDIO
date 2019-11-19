@@ -54,7 +54,7 @@ void loop()
     }
   }
   if (millis() > multiplo * 60000) {
-    Serial.println("Pulse 1 si desea continuar utilizando el programa");
+    Serial.println("Pulse 1  si desea continuar utilizando el programa");
     Serial.println(" ");
     delay(5000);
     int x = Serial.parseInt();

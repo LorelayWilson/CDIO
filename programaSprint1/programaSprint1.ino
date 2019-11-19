@@ -42,7 +42,7 @@
 void menuSensores(){
 
   //Numero sera el numero del personal. Ultima casilla sera la ultima posicion que esta vacia en la memoria EEPROM
-  int numero, ultima_casilla;
+  int numero, ultima_casilla,multiplo=1;
   //Se guardara la lectura de los sensores
   int16_t lectura;
   if(flag){
@@ -126,8 +126,23 @@ void menuSensores(){
             Serial.println("Opcion no valida");
             flag = true;
         }
-     }
-  }
+      }
+
+
+      if (millis() > multiplo * 60000) {
+        Serial.println("Pulse 1  si desea continuar utilizando el programa");
+        Serial.println(" ");
+        delay(5000);
+        int x = Serial.parseInt();
+        if (x != 1) {
+          Serial.println("El programa se detendrá");
+          Serial.println(" ");
+          ESP.deepSleep(30000000);
+        } else{
+          multiplo++;
+        }
+      }
+    }
 }
 
 
