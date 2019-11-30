@@ -8,10 +8,10 @@
 
 /****************************************************************************************************************************************
  *********************************************************CONSTANTES DEL PROGRAMA********************************************************
- *                                                 Estos se deben cambiar según los valores
- *                                                 calibrados de cada sensor en cuestion
- *                                                 Calibra primero tus sensores, y modifica
- *                                                 estas constantes según tu calibracion
+ *                                                 Estos se deben cambiar según los valores                                             *
+ *                                                 calibrados de cada sensor en cuestion                                                *
+ *                                                 Calibra primero tus sensores, y modifica                                             *
+ *                                                 estas constantes según tu calibracion                                                *
  ****************************************************************************************************************************************/
 
   //CONSTANTES SENSOR HUMEDAD
@@ -29,6 +29,11 @@
   const double B  = 790;  //ordenada en el origen
   const double M = 34.9; //  pendiente_calibrado
   const int ADCT = 2;  // Pin de entrada analogica para sensor temperatura
+
+  //CONSTANTES SENSOR LUZ
+  const int VTBpin = 0;  //
+  const int oscuro = 25;
+  const int saturacion = 1800;
 
   //CAMBIAR SEGUN LA DIRECCION DE MEMORIA QUE USAS
   Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48

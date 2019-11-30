@@ -20,7 +20,7 @@ void medirHumedad(int airValue, int waterValue, int16_t adc) {
     Serial.print("Error lectura humedad: ");
     Serial.print(humedad);
     Serial.println("%");
-  } else {
+    }else{
     Serial.print("La humedad es: ");
     Serial.print(humedad);
     Serial.println("%");
