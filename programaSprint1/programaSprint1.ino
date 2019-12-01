@@ -35,7 +35,7 @@
   //CONSTANTES SENSOR ILUMINACION 
   /*const double B  = 790;  //ordenada en el origen
   const double M = 34.9; //  pendiente_calibrado
-  const int ADCT = 2;  // Pin de entrada analogica para sensor temperatura*/
+  const int ADCL = 2;  // Pin de entrada analogica para sensor temperatura*/
 
   //CAMBIAR SEGUN LA DIRECCION DE MEMORIA QUE USAS
   Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
@@ -102,7 +102,7 @@ void configurarAcelerometro(){
    // Configurar acelerometro
    I2CwriteByte(MPU9250_ADDRESS, 28, ACC_FULL_SCALE_16_G);
 
-   //*ESTO ES LA TABLA QUE HEMOS HECHO*
+   //*ESTO ES LA TABLA QUE HEMOS HECHO* 0000 0000
    I2CwriteByte(MPU9250_ADDRESS, PWR_MGMT_1, 0);
    I2CwriteByte(MPU9250_ADDRESS, PWR_MGMT_2, 7);
    I2CwriteByte(MPU9250_ADDRESS,ACCEL_CONFIG_2 ,5 );
@@ -116,6 +116,8 @@ void configurarAcelerometro(){
    // Configurar interrupcion
    pinMode(interruptPin, INPUT_PULLUP);
    attachInterrupt(digitalPinToInterrupt(interruptPin), interrupcion , FALLING);
+
+   
 }
 
 void lecturaAcelerometro(){
@@ -269,6 +271,7 @@ void menuSensores(){
             ESP.deepSleep(30000000);
             flag = true;
             break;
+            
           default:
             Serial.println("Opcion no valida");
             flag = true;
@@ -298,6 +301,7 @@ void menuSensores(){
 //Función que se produce una sola vez para ajustar lo que necesitemos en el programa
 void setup() {
   Serial.begin(9600); //Establecemos la velocidad de datos en 9600 baudios
+  Wire.begin();
   ads1115.begin(); //Inicializamos el ADS1115
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
   EEPROM.begin(512); //Inicializamos la memoria EEPROM
@@ -313,6 +317,7 @@ void setup() {
 //Función loop donde se llamará a las funciones de los sensores
 void loop() {
 
-  menuSensores();
+  //menuSensores();
+  lecturaAcelerometro();
   delay (5000);
 }
