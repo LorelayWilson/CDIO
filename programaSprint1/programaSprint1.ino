@@ -37,6 +37,9 @@
   const int oscuro = 25;
   const int saturacion = 1800;
 
+  //CONSTANTES GPS
+  unsigned long ms;
+
   //CAMBIAR SEGUN LA DIRECCION DE MEMORIA QUE USAS
   Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
   
@@ -160,8 +163,10 @@ Conectar TXO al pin 13 del ESP8266
 Usamos el pin 15 para inicializar el GPS
 ******************************************************************************/
 
-
-
+#define RX_PIN  12 // GPS RXI
+#define TX_PIN  13 // GPS TX0
+#define INIT_PIN 15 // Pin para  Inicializar el GPS
+#define GPS_BAUD  4800  //  velocidad de comunicaciÃ³n serie
 
  
 /****************************************************************************************************************************************
