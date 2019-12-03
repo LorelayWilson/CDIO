@@ -63,3 +63,17 @@ void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int16_t a
   Serial.print("Temperatura: ");
   Serial.println(temperatura);
 }
+
+void medirLuz(int VTBpin, int saturacion, int oscuro)
+{
+  	
+    int16_t v = ads1115.readADC_SingleEnded(VTBpin); //Lectura del pin VTBpin o AO.
+    int16_t  voltaje = (4096 / (pow(2, 15) - 1)) *  v;
+
+    if(voltaje <= oscuro) Serial.println("Es de noche o el sensor esta tapado."); 
+    if(voltaje >= saturacion) Serial.println("Completamente soleado.");
+    if(voltaje > oscuro && voltaje < saturacion) Serial.println("Con sombra o nuves.");
+     
+	delay(2000);
+
+}
