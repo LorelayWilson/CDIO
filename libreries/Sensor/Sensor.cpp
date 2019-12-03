@@ -20,10 +20,18 @@ void medirHumedad(int airValue, int waterValue, int16_t adc) {
     Serial.print("Error lectura humedad: ");
     Serial.print(humedad);
     Serial.println("%");
-    }else{
-    Serial.print("La humedad es: ");
-    Serial.print(humedad);
-    Serial.println("%");
+  } else {
+    if(adc > (waterValue - H) and adc < (waterValue)){
+	    Serial.print("La humedad es: ");
+	    Serial.println("100 %");
+	} if ((airValue + H)  > adc and adc > (airValue)){
+	    Serial.print("La humedad es: ");
+	    Serial.println("0 %");
+	} else{
+	    Serial.print("La humedad es: ");
+	    Serial.print(humedad);
+	    Serial.println(" %");
+	}
   }
 }
 
@@ -44,9 +52,18 @@ void medirSalinidad(int noSalineValue, int maxSalineValue, int16_t adc) {
     Serial.println(" %");
 
   } else {
-    Serial.print("La salinidad es: ");
-    Serial.print(salinidad);
-    Serial.println(" %");
+
+  	if(adc > (noSalineValue - S) and adc < (noSalineValue)){
+	    Serial.print("La salinidad es: ");
+	    Serial.println("0 %");
+	} if ((maxSalineValue + S) > adc   and adc > (maxSalineValue)){
+	    Serial.print("La salinidad es: ");
+	    Serial.println("100 %");
+	} else{
+	    Serial.print("La salinidad es: ");
+	    Serial.print(salinidad);
+	    Serial.println(" %");
+	}
   }
 }
 
