@@ -33,9 +33,9 @@
   const int ADCT = 2;  // Pin de entrada analogica para sensor temperatura
 
   //CONSTANTES SENSOR LUZ
-  const int VTBpin = 0;  //
-  const int oscuro = 25;
-  const int saturacion = 1800;
+  const int ADCL = 3;  //Pin de entrada analógica para el sensor de salinidad
+  const int MIN_LUZ = 25; //calibración con mínima luz (oscuridad)
+  const int MAX_LUZ = 1800; //calibración con máxima luz (saturado)
 
   //CAMBIAR SEGUN LA DIRECCION DE MEMORIA QUE USAS
   Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
@@ -116,8 +116,6 @@ void configurarAcelerometro(){
    // Configurar interrupcion
    pinMode(interruptPin, INPUT_PULLUP);
    attachInterrupt(digitalPinToInterrupt(interruptPin), interrupcion , FALLING);
-
-   
 }
 
 void lecturaAcelerometro(){
@@ -242,8 +240,8 @@ void menuSensores(){
             break;
             
           case 7:
-            /*lectura = ads1115.readADC_SingleEnded(ADCT);
-            medirTemperatura(B, M, lectura);
+            lectura = ads1115.readADC_SingleEnded(ADCL);
+            medirLuz(MAX_LUZ, MIN_LUZ, lectura);
             flag = true;*/
             break;
 
