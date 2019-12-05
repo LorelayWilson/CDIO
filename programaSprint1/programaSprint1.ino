@@ -73,7 +73,12 @@
 
 #define interruptPin 4 //pin de interrupcion -> 4
 
-//Funcion auxiliar lectura
+/*Funcion auxiliar lectura
+ * @param Address
+ * @param Register
+ * @param Nbytes
+ * @param Data
+ */
 void I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data){
    Wire.beginTransmission(Address);
    Wire.write(Register);
@@ -85,7 +90,11 @@ void I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data){
       Data[index++] = Wire.read();
 }
  
-// Funcion auxiliar de escritura
+/*Funcion auxiliar de escritura
+ * @param Address
+ * @param Register
+ * @param Data
+ */
 void I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data){
    Wire.beginTransmission(Address);
    Wire.write(Register);
@@ -93,37 +102,51 @@ void I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data){
    Wire.endTransmission();
 }
 
+/*
+ * 
+ */
 void interrupcion(){
   interruptCounter++;
 }
 
+/*
+ * 
+ */
 void configurarAcelerometro(){
-  Wire.begin();
+    Wire.begin();
    // Configurar acelerometro
    I2CwriteByte(MPU9250_ADDRESS, 28, ACC_FULL_SCALE_16_G);
 
-   //*ESTO ES LA TABLA QUE HEMOS HECHO* 0000 0000
+   //Configurar giroscopio
+   I2CwriteByte(MPU9250_ADDRESS, 27, GYRO_FULL_SCALE_2000_DPS);
+
+   //*ESTO ES LA TABLA QUE HEMOS HECHO*
    I2CwriteByte(MPU9250_ADDRESS, PWR_MGMT_1, 0);
    I2CwriteByte(MPU9250_ADDRESS, PWR_MGMT_2, 7);
-   I2CwriteByte(MPU9250_ADDRESS,ACCEL_CONFIG_2 ,5 );
+   I2CwriteByte(MPU9250_ADDRESS,ACCEL_CONFIG_2 ,9 );
    I2CwriteByte(MPU9250_ADDRESS,INT_ENABLE ,64 );
-   I2CwriteByte(MPU9250_ADDRESS,0x37 ,128 ); 
+   I2CwriteByte(MPU9250_ADDRESS,0x37, 128); 
    I2CwriteByte(MPU9250_ADDRESS,MOST_DETECT_CTRL ,192 );
    I2CwriteByte(MPU9250_ADDRESS,LP_ACCEL_ODR ,1 ); 
    I2CwriteByte(MPU9250_ADDRESS,WOM_THR ,2 ); 
    I2CwriteByte(MPU9250_ADDRESS, PWR_MGMT_1, 32); 
-   
-   // Configurar interrupcion
-   pinMode(interruptPin, INPUT_PULLUP);
-   attachInterrupt(digitalPinToInterrupt(interruptPin), interrupcion , FALLING);
 }
 
+void interrupciones(){
+     // Configurar interrupcion
+   pinMode(interruptPin, INPUT_PULLUP);
+   attachInterrupt(digitalPinToInterrupt(interruptPin), interrupcion , CHANGE);
+}
+
+/*
+ * 
+ */
 void lecturaAcelerometro(){
 
    // ---  Lectura acelerometro y giroscopio --- 
    uint8_t Buf[14];
    int FS_ACC = 16;
-   int FS_GYRO = 2000;
+   int FS_GYRO=2000;
 
    I2Cread(MPU9250_ADDRESS, 0x3B, 14, Buf);
  
@@ -132,9 +155,9 @@ void lecturaAcelerometro(){
    float ay = (Buf[2] << 8 | Buf[3]);
    float az = Buf[4] << 8 | Buf[5];
 
-   ax = (ax*FS_ACC/32768) - 25.57;
-   ay = (ay*FS_ACC/32768) - 31.78;
-   az = (az*FS_ACC/32768) + 0.94;
+   ax = (ax*FS_ACC/32768) - 0.24;
+   ay = (ay*FS_ACC/32768) - 0.24;
+   az = (az*FS_ACC/32768) - 7.37;
 
    // Acelerometro
    Serial.println("Lectura Acelerometro");
@@ -165,6 +188,26 @@ Usamos el pin 15 para inicializar el GPS
 /****************************************************************************************************************************************
  *FUNCION MENU DEL PROGRAMA
  ****************************************************************************************************************************************/
+
+ void mostrarMenu() {
+  Serial.println("Pulse 1 para identificarse");
+  Serial.println("Pulse 2 para comprobar el registro de trabajadores");
+  Serial.println("Pulse 3 para borrar el registro actual");
+  Serial.println("Pulse 4 para ver la Humedad");
+  Serial.println("Pulse 5 para ver la Salinidad");
+  Serial.println("Pulse 6 para ver la Temperatura");
+  Serial.println("Pulse 7 para ver la Iluminacion");
+  Serial.println("Pulse 8 para ver datos del GPS");
+  Serial.println("Pulse 9 para ver datos del Acelerómetro");
+  Serial.println("Pulse 0 para acabar su jornada");
+  Serial.println("Pulse f para finalizar el programa");
+  delay(5000);
+
+}
+
+ /*
+  * Función donde crearemos al menú
+  */
 void menuSensores(){
 
   //Numero sera el numero del personal. Ultima casilla sera la ultima posicion que esta vacia en la memoria EEPROM
@@ -172,18 +215,7 @@ void menuSensores(){
   //Se guardara la lectura de los sensores
   int16_t lectura;
   if(flag){
-      Serial.println("Pulse 1 para identificarse");
-      Serial.println("Pulse 2 para comprobar el registro de trabajadores");
-      Serial.println("Pulse 3 para borrar el registro actual");
-      Serial.println("Pulse 4 para ver la Humedad");
-      Serial.println("Pulse 5 para ver la Salinidad");
-      Serial.println("Pulse 6 para ver la Temperatura");
-      Serial.println("Pulse 7 para ver la Iluminacion");
-      Serial.println("Pulse 8 para ver datos del GPS");
-      Serial.println("Pulse 9 para ver datos del Acelerómetro");
-      Serial.println("Pulse 0 para acabar su jornada");
-      Serial.println("Pulse f para finalizar el programa");
-      delay(5000);
+      mostrarMenu();
       flag = false;
   }
   if(Serial.available()){
@@ -199,6 +231,7 @@ void menuSensores(){
             Serial.println("Introduzca su numero");
             delay(5000);
             numero = Serial.parseInt();
+            //Funciones contenidas en Identificar Personas
             ultima_casilla = localizarUltimaCasilla();
             leerNumero(numero, ultima_casilla);
             mostrarNumero(ultima_casilla);
@@ -208,12 +241,14 @@ void menuSensores(){
 
           case 2:
             Serial.print("El registro es: ");
+            //Funciones contenidas en Identificar Personas
             ultima_casilla = localizarUltimaCasilla();
             comprobarRegistro(ultima_casilla);
             flag = true;
             break;
 
           case 3:
+          //Funcion contenida en Identificar Personas
             inicializarMemoriaEEPROM();
             Serial.println("Memoria reiniciada");
             flag = true;
@@ -242,18 +277,16 @@ void menuSensores(){
           case 7:
             lectura = ads1115.readADC_SingleEnded(ADCL);
             medirLuz(MAX_LUZ, MIN_LUZ, lectura);
-            flag = true;*/
+            flag = true;
             break;
 
           case 8:
-            /*lectura = ads1115.readADC_SingleEnded(ADCT);
-            medirTemperatura(B, M, lectura);*/
+            lecturaGPS();
             flag = true;
             break;
 
           case 9:
-            /*lectura = ads1115.readADC_SingleEnded(ADCT);
-            medirTemperatura(B, M, lectura);*/
+            lecturaAcelerometro();
             flag = true;
             break;
             
@@ -261,6 +294,7 @@ void menuSensores(){
             Serial.println("Introduzca su numero");
             delay(5000);
             numero = Serial.parseInt();
+            //Funcion contenida en Identificar Personas
             mensaje(numero-1, 1);
             break;
             
@@ -296,14 +330,16 @@ void menuSensores(){
 /****************************************************************************************************************************************
  *FUNCION SETUP
  ****************************************************************************************************************************************/
-//Función que se produce una sola vez para ajustar lo que necesitemos en el programa
+/* 
+ *  Función que se produce una sola vez para ajustar lo que necesitemos en el programa
+ */
 void setup() {
   Serial.begin(9600); //Establecemos la velocidad de datos en 9600 baudios
-  Wire.begin();
   ads1115.begin(); //Inicializamos el ADS1115
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
   EEPROM.begin(512); //Inicializamos la memoria EEPROM
   flag = true;
+  configurarAcelerometro();
   if (comprobarInicializacion() == false) {
     inicializarMemoriaEEPROM();
   }
@@ -316,6 +352,12 @@ void setup() {
 void loop() {
 
   //menuSensores();
+  interrupciones();
+  if (interruptCounter>0){
+    interruptCounter--;   //para que vuelva a cero
+    numOfInterrupts++;         
+  }
+  Serial.println(numOfInterrupts);
   lecturaAcelerometro();
   delay (5000);
 }
