@@ -106,14 +106,14 @@ void I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data){
 }
 
 /*
- * 
+ * Funcion para utilizar en el handleInterrupt
  */
 void interrupcion(){
   interruptCounter++;
 }
 
 /*
- * 
+ * Función para configurar el acelerometro
  */
 void configurarAcelerometro(){
     Wire.begin();
@@ -133,16 +133,14 @@ void configurarAcelerometro(){
    I2CwriteByte(MPU9250_ADDRESS,LP_ACCEL_ODR ,1 ); 
    I2CwriteByte(MPU9250_ADDRESS,WOM_THR ,2 ); 
    I2CwriteByte(MPU9250_ADDRESS, PWR_MGMT_1, 32); 
-}
 
-void interrupciones(){
-     // Configurar interrupcion
+   // Configurar interrupcion
    pinMode(interruptPin, INPUT_PULLUP);
    attachInterrupt(digitalPinToInterrupt(interruptPin), interrupcion , CHANGE);
 }
 
 /*
- * 
+ * Funcion para sacar por pantalla los datos del acelerometro
  */
 void lecturaAcelerometro(){
 
