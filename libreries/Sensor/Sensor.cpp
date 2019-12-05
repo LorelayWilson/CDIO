@@ -4,9 +4,14 @@
 
 #include "Sensor.h"
 
+
 // -------------- FUNCIONES PARA MOSTRAR POR PANTALLA --------------
 
-//Función de humedad para calcular y mostrar por pantalla el porcentaje de humedad
+/* Función para devolver por pantalla la lectura de la humedad
+*@param airValue es el valor que hemos obtenido al dejar el sensor al aire
+*@param waterValue es el valor que hemos obtenido al dejar el sensor introducido completamente en agua
+*@param adc es la lectura del ads
+*/
 void medirHumedad(int airValue, int waterValue, int16_t adc) {
 
   int H = 600; //constante que usaremos como margen de error para humedad
@@ -21,6 +26,8 @@ void medirHumedad(int airValue, int waterValue, int16_t adc) {
     Serial.print(humedad);
     Serial.println("%");
   } else {
+
+  	//Realizamos unos límites para que no pueda superar el 100% o ser más pequeño que el 0%
     if(adc > (waterValue - H) and adc < (waterValue)){
 	    Serial.print("La humedad es: ");
 	    Serial.println("100 %");
@@ -36,7 +43,11 @@ void medirHumedad(int airValue, int waterValue, int16_t adc) {
 }
 
 
-//Descripción de la función: muestra por pantalla el porcentaje de salinidad
+/* Función para devolver por pantalla la lectura de la salinidad
+*@param noSalineValue es el valor al tener 0 de salinidad
+*@param maxSalineValue es el valor al saturar el agua con sal
+*@param adc es la lectura del ads
+*/
 void medirSalinidad(int noSalineValue, int maxSalineValue, int16_t adc) {
 
   int S = 500; //constante que usaremos como margen de error para salinidad
@@ -67,7 +78,11 @@ void medirSalinidad(int noSalineValue, int maxSalineValue, int16_t adc) {
   }
 }
 
-
+/* Función para devolver por pantalla la lectura de la temperatura
+*@param ordenada_calibrado es la ordenada de la recta de calibracion
+*@param pendiente_calibrado es la pendiente de la recta de calibracion
+*@param adc es la lectura del ads
+*/
 void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int16_t adc) {
 
   //Guardamos el valor que mide el sensor de temperatura que se comunica con el pin A2
@@ -81,16 +96,20 @@ void medirTemperatura(int ordenada_calibrado, int pendiente_calibrado, int16_t a
   Serial.println(temperatura);
 }
 
-void medirLuz(int VTBpin, int saturacion, int oscuro)
-{
+/* Función para devolver por pantalla la lectura de la iluminacion
+*@param saturacion es el valor maximo de calibracion cuando hay maxima luz
+*@param oscuro es el valor minimo de calibracion cuando está a oscuras
+*@param adc es la lectura del ads
+*/
+void medirLuz(int saturacion, int oscuro, int16_t adc){
   	
-    int16_t v = ads1115.readADC_SingleEnded(VTBpin); //Lectura del pin VTBpin o AO.
-    int16_t  voltaje = (4096 / (pow(2, 15) - 1)) *  v;
+  	//Guardamos el valor que mide el sensor de iluminacion que se comunica con el pin A3
+	int16_t  voltaje = (4096 / (pow(2, 15) - 1)) *  adc;
 
-    if(voltaje <= oscuro) Serial.println("Es de noche o el sensor esta tapado."); 
-    if(voltaje >= saturacion) Serial.println("Completamente soleado.");
-    if(voltaje > oscuro && voltaje < saturacion) Serial.println("Con sombra o nuves.");
-     
-	delay(2000);
-
+	//Mostrar por pantalla segun los valores de calibración
+	if(voltaje <= oscuro) Serial.println("Es de noche o el sensor esta tapado."); 
+	if(voltaje >= saturacion) Serial.println("Completamente soleado.");
+	if(voltaje > oscuro && voltaje < ((saturacion-oscuro)/2)) Serial.println("Bastante nublado.");
+	if(voltaje > ((saturacion-oscuro)/2) && voltaje < saturacion) Serial.println("Poco nublado.");
+	 
 }
