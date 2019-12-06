@@ -47,7 +47,7 @@
   bool flag = false;
   int multiplo=1;
   int numOfInterrupts=0;
-  volatile byte interruptCounter = 0;
+  volatile byte interruptCounter=0;
   
 /****************************************************************************************************************************************
  *ACELEROMETRO
@@ -74,7 +74,7 @@
 #define WOM_THR                 0x1F
 #define LP_ACCEL_ODR            0x1E
 
-#define interruptPin 4 //pin de interrupcion -> 4
+const byte interruptPin = 4; //pin de interrupcion -> 4
 
 /*Funcion auxiliar lectura
  * @param Address
@@ -187,6 +187,8 @@ Usamos el pin 15 para inicializar el GPS
 #define INIT_PIN 15 // Pin para  Inicializar el GPS
 #define GPS_BAUD  4800  //  velocidad de comunicaciÃ³n serie
 
+SoftwareSerial ss(RX_PIN, TX_PIN);
+
  
 /****************************************************************************************************************************************
  *FUNCION MENU DEL PROGRAMA
@@ -284,7 +286,8 @@ void menuSensores(){
             break;
 
           case 8:
-            lecturaGPS();
+           
+            mostrarGps(ss);
             flag = true;
             break;
 
@@ -343,6 +346,7 @@ void setup() {
   EEPROM.begin(512); //Inicializamos la memoria EEPROM
   flag = true;
   configurarAcelerometro();
+  startGps(GPS_BAUD, INIT_PIN);
   if (comprobarInicializacion() == false) {
     inicializarMemoriaEEPROM();
   }
@@ -354,13 +358,11 @@ void setup() {
 //Función loop donde se llamará a las funciones de los sensores
 void loop() {
 
-  //menuSensores();
-  interrupciones();
-  if (interruptCounter>0){
-    interruptCounter--;   //para que vuelva a cero
-    numOfInterrupts++;         
-  }
+  menuSensores();
+
+  /*if(interruptCounter>0)
+    Serial.println("es mayor");
   Serial.println(numOfInterrupts);
-  lecturaAcelerometro();
+  lecturaAcelerometro();*/
   delay (5000);
 }
