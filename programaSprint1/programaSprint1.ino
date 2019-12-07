@@ -2,11 +2,12 @@
 #include <Wire.h>
 #include <math.h>
 #include "Sensor.h"
+//#include "Gps.h"
 #include "IdentificarPersonas.h"
 #include <EEPROM.h>
 #include <Adafruit_ADS1015.h>
-/*#include <TinyGPS++.h>  //Librería del GPS
-#include <SoftwareSerial.h>*/
+#include <TinyGPS++.h>  //Librería del GPS
+#include <SoftwareSerial.h>
 
 /****************************************************************************************************************************************
  *********************************************************CONSTANTES DEL PROGRAMA********************************************************
@@ -20,7 +21,7 @@
   const double AIR_VALUE = 20200;  // Medimos valor minimo de humedad (valor en seco)
   const double WATER_VALUE = 10250;  // Medimos valor maximo de humedad (valor en agua)
   const int ADCH = 0;  // Pin de entrada analogica para sensor humedad
-
+ 
   //CONSTANTES SENSOR SALINIDAD
   const double MIN_SALINIDAD = 3111; //Valor de la medida del sensor en agua destilada sin nada
   const double MAX_SALINIDAD = 22873; //Valor de la medida del sensor en agua destilada con la máxima cantidad de sal
@@ -39,6 +40,9 @@
 
   //CONSTANTES GPS
   unsigned long ms;
+
+  //CONSTANTES ACELEROMETRO
+  const byte interruptPin = 4; //pin de interrupcion -> 4
 
   //CAMBIAR SEGUN LA DIRECCION DE MEMORIA QUE USAS
   Adafruit_ADS1115 ads1115(0x48); // Creamos una dirección de memoría para la Ads1115 en la dirección 0x48
@@ -70,11 +74,9 @@
 #define PWR_MGMT_2              0x6C
 #define ACCEL_CONFIG_2          0x1D
 #define INT_ENABLE              0x38 
-#define MOST_DETECT_CTRL        0x69
+#define MOT_DETECT_CTRL        0x69
 #define WOM_THR                 0x1F
 #define LP_ACCEL_ODR            0x1E
-
-const byte interruptPin = 4; //pin de interrupcion -> 4
 
 /*Funcion auxiliar lectura
  * @param Address
@@ -129,7 +131,7 @@ void configurarAcelerometro(){
    I2CwriteByte(MPU9250_ADDRESS,ACCEL_CONFIG_2 ,9 );
    I2CwriteByte(MPU9250_ADDRESS,INT_ENABLE ,64 );
    I2CwriteByte(MPU9250_ADDRESS,0x37, 128); 
-   I2CwriteByte(MPU9250_ADDRESS,MOST_DETECT_CTRL ,192 );
+   I2CwriteByte(MPU9250_ADDRESS,MOT_DETECT_CTRL ,192 );
    I2CwriteByte(MPU9250_ADDRESS,LP_ACCEL_ODR ,1 ); 
    I2CwriteByte(MPU9250_ADDRESS,WOM_THR ,2 ); 
    I2CwriteByte(MPU9250_ADDRESS, PWR_MGMT_1, 32); 
@@ -188,8 +190,74 @@ Usamos el pin 15 para inicializar el GPS
 #define GPS_BAUD  4800  //  velocidad de comunicaciÃ³n serie
 
 SoftwareSerial ss(RX_PIN, TX_PIN);
+TinyGPSPlus gps; // Definimos el objeto gps
 
+// Función espera 1s para leer del GPS
+static void smartDelay(unsigned long ms)
+{
+  unsigned long start = millis();
+  do
+  {
+    while(ss.available())
+    {
+      gps.encode(ss.read());  // leemos del gps
+    }
+  } while(millis() - start < ms);
+}
+// Función para encender/apagar mediante un pulso
+void switch_on_off(){
+   // Power on pulse
+  digitalWrite(INIT_PIN,LOW);
+  delay(200);
+  digitalWrite(INIT_PIN,HIGH);
+  delay(200); 
+  digitalWrite(INIT_PIN,LOW);
+}
+
+void configurarGps(){
+  ss.begin(GPS_BAUD); // Inicializar la comunicación con el GPS
+  pinMode(INIT_PIN,OUTPUT); 
+  switch_on_off(); // Pulso para encender el GPS
+}
  
+void mostrarGps(){
+  Serial.println("Fecha      Hora       Latitud   Longitud   Alt    Rumbo   Velocidad");
+  Serial.println("(MM/DD/YY) (HH/MM/SS)     (deg)       (deg)  (ft)                   (mph)");
+  Serial.println("-------------------------------------------------------------------------");
+
+  char gpsDate[10]; 
+  char gpsTime[10];
+
+  if(gps.location.isValid()){ // Si el GPS está recibiendo los mensajes NMEA
+
+    sprintf(gpsDate,"%d/%d/%d", gps.date.month(),gps.date.day(),gps.date.year()); // Construimos string de datos fecha
+    sprintf(gpsTime,"%d/%d/0%d", gps.time.hour(),gps.time.minute(),gps.time.second());  // Construimos string de datos hora
+
+    Serial.print(gpsDate);
+    Serial.print('\t');
+    Serial.print(gpsTime);
+    Serial.print('\t');
+    Serial.print(gps.location.lat(),6);
+    Serial.print('\t');
+    Serial.print(gps.location.lng(),6);
+    Serial.print('\t');
+    Serial.print(gps.altitude.feet());
+    Serial.print('\t');
+    Serial.print(gps.course.deg(),2);
+    Serial.print('\t');
+    Serial.println(gps.speed.mph(),2);
+  }
+  else  // Si no recibe los mensajes
+  {
+    
+    Serial.print("Satellites in view: ");
+    Serial.println(gps.satellites.value());
+  }
+  smartDelay(1000);
+
+   
+  
+}
 /****************************************************************************************************************************************
  *FUNCION MENU DEL PROGRAMA
  ****************************************************************************************************************************************/
@@ -245,7 +313,7 @@ void menuSensores(){
             break;
 
           case 2:
-            Serial.print("El registro es: ");
+            Serial.println("El registro es: ");
             //Funciones contenidas en Identificar Personas
             ultima_casilla = localizarUltimaCasilla();
             comprobarRegistro(ultima_casilla);
@@ -286,8 +354,8 @@ void menuSensores(){
             break;
 
           case 8:
-           
-            mostrarGps(ss);
+
+            mostrarGps();
             flag = true;
             break;
 
@@ -316,8 +384,9 @@ void menuSensores(){
         }
       }
 
-
-      if (millis() > multiplo * 60000) {
+      Serial.println();
+      
+      if (millis() > multiplo * 120000) {
         Serial.println("Pulse 1  si desea continuar utilizando el programa");
         Serial.println(" ");
         delay(5000);
@@ -346,7 +415,7 @@ void setup() {
   EEPROM.begin(512); //Inicializamos la memoria EEPROM
   flag = true;
   configurarAcelerometro();
-  startGps(GPS_BAUD, INIT_PIN);
+  configurarGps();
   if (comprobarInicializacion() == false) {
     inicializarMemoriaEEPROM();
   }

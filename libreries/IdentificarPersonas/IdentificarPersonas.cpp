@@ -66,7 +66,7 @@ void mensaje(int i, int j){
 	String nombres[] = {"Ivan", "Raul", "Ferran", "Lorena", "Asun", "Pepe"};
 	String mensaje[] = {"Bienvenido/a, ", "Hasta luego, "};
 	
-	if(i<1 or i>6) //buscar algo parecido a nombres.length()
+	if(i<0 or i>5) //buscar algo parecido a nombres.length()
 
 		  Serial.println("Numero de identificacion erroneo.");
  	else {

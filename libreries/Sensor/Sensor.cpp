@@ -20,18 +20,11 @@ void medirHumedad(int airValue, int waterValue, int16_t adc) {
   //Guardamos en humedad el calculo del porcentaje
   int16_t humedad = 100 * airValue / (airValue - waterValue) - adc * 100 / (airValue - waterValue);
 
-  //Bucle que usamos para mandar mensaje de error si la lectura del adc0 no concuerda con la calibración
-  if (adc < (waterValue - H) or adc > (airValue + H)) {
-    Serial.print("Error lectura humedad: ");
-    Serial.print(humedad);
-    Serial.println("%");
-  } else {
-
-  	//Realizamos unos límites para que no pueda superar el 100% o ser más pequeño que el 0%
-    if(adc > (waterValue - H) and adc < (waterValue)){
+  //Realizamos unos límites para que no pueda superar el 100% o ser más pequeño que el 0%
+  if(adc < waterValue){
 	    Serial.print("La humedad es: ");
 	    Serial.println("100 %");
-	} if ((airValue + H)  > adc and adc > (airValue)){
+	} else if (airValue > adc){
 	    Serial.print("La humedad es: ");
 	    Serial.println("0 %");
 	} else{
@@ -39,7 +32,6 @@ void medirHumedad(int airValue, int waterValue, int16_t adc) {
 	    Serial.print(humedad);
 	    Serial.println(" %");
 	}
-  }
 }
 
 
@@ -56,18 +48,10 @@ void medirSalinidad(int noSalineValue, int maxSalineValue, int16_t adc) {
   int16_t salinidad = ((adc - noSalineValue) * 100) / (maxSalineValue - noSalineValue);
 
   //Filtramos los valores obtenidos del sensor para que ver si se encuentran dentro de los límites de la calibración
-  if (adc < (noSalineValue - S) or adc > (maxSalineValue + S)) {
-    Serial.print("Error de lectura salinidad: ");
-    Serial.print("La salinidad es: ");
-    Serial.print(salinidad);
-    Serial.println(" %");
-
-  } else {
-
-  	if(adc > (noSalineValue - S) and adc < (noSalineValue)){
+  	if(adc < noSalineValue){
 	    Serial.print("La salinidad es: ");
 	    Serial.println("0 %");
-	} if ((maxSalineValue + S) > adc   and adc > (maxSalineValue)){
+	} else if (adc > maxSalineValue){
 	    Serial.print("La salinidad es: ");
 	    Serial.println("100 %");
 	} else{
@@ -75,7 +59,6 @@ void medirSalinidad(int noSalineValue, int maxSalineValue, int16_t adc) {
 	    Serial.print(salinidad);
 	    Serial.println(" %");
 	}
-  }
 }
 
 /* Función para devolver por pantalla la lectura de la temperatura

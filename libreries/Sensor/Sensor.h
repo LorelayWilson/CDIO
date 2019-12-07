@@ -12,6 +12,6 @@
 void medirHumedad(int, int, int16_t);
 void medirSalinidad(int, int, int16_t);
 void medirTemperatura(int, int, int16_t); 
-void medirLuz(int, int, int);
+void medirLuz(int, int, int16_t);
 
  #endif

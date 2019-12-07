@@ -28,12 +28,11 @@ void switch_on_off(int INIT_PIN){
   digitalWrite(INIT_PIN,LOW);
  }//()
 
-
 /////////////////////////////////////////////////////////////////////////
 //                           CONFIGURACION                             //
 /////////////////////////////////////////////////////////////////////////
 
-void startGps(int GPS_BAUD, int INIT_PIN) {
+void startGps(int GPS_BAUD, int INIT_PIN, SoftwareSerial ss) {
 
   ss.begin(GPS_BAUD); // Inicializar la comunicacion con el GPS
   
@@ -58,7 +57,7 @@ void mostrarGps(SoftwareSerial ss) {
     Serial.println("(MM/DD/YY) (HH/MM/SS)     (deg)       (deg)  (ft)                   (mph)");
     Serial.println("-------------------------------------------------------------------------");
 
-	sprintf(gpsDate,"%d/%d/%d", gps.date.month(),gps.date.day(),gps.date.year()); // Construimos string de datos fecha
+    sprintf(gpsDate,"%d/%d/%d", gps.date.month(),gps.date.day(),gps.date.year()); // Construimos string de datos fecha
     sprintf(gpsTime,"%d/%d/0%d", gps.time.hour(),gps.time.minute(),gps.time.second());  // Construimos string de datos hora
 
     Serial.print(gpsDate);
@@ -73,7 +72,7 @@ void mostrarGps(SoftwareSerial ss) {
     Serial.print('\t');
     Serial.print(gps.course.deg(),2);
     Serial.print('\t');
-    Serial.println(gps.speed.mph(),2)
+    Serial.println(gps.speed.mph(),2);
   
   }else{  // Si no recibe los mensajes
   
