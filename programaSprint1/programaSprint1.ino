@@ -57,26 +57,21 @@
  *ACELEROMETRO
  ****************************************************************************************************************************************/
 
-#define MPU9250_ADDRESS            0x68
-#define MAG_ADDRESS                0x0C
- 
-#define GYRO_FULL_SCALE_250_DPS    0x00  
-#define GYRO_FULL_SCALE_500_DPS    0x08
-#define GYRO_FULL_SCALE_1000_DPS   0x10
-#define GYRO_FULL_SCALE_2000_DPS   0x18
+#define MPU9250_ADDRESS           0x68
+#define MAG_ADDRESS               0x0C
  
 #define ACC_FULL_SCALE_2_G        0x00  
 #define ACC_FULL_SCALE_4_G        0x08
 #define ACC_FULL_SCALE_8_G        0x10
 #define ACC_FULL_SCALE_16_G       0x18
 
-#define PWR_MGMT_1              0x6B
-#define PWR_MGMT_2              0x6C
-#define ACCEL_CONFIG_2          0x1D
-#define INT_ENABLE              0x38 
-#define MOT_DETECT_CTRL        0x69
-#define WOM_THR                 0x1F
-#define LP_ACCEL_ODR            0x1E
+#define PWR_MGMT_1                0x6B
+#define PWR_MGMT_2                0x6C
+#define ACCEL_CONFIG_2            0x1D
+#define INT_ENABLE                0x38 
+#define MOT_DETECT_CTRL           0x69
+#define WOM_THR                   0x1F
+#define LP_ACCEL_ODR              0x1E
 
 /*Funcion auxiliar lectura
  * @param Address
@@ -370,6 +365,7 @@ void menuSensores(){
             numero = Serial.parseInt();
             //Funcion contenida en Identificar Personas
             mensaje(numero-1, 1);
+            flag = true;
             break;
             
           case 'f':
