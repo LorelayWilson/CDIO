@@ -7,17 +7,9 @@
 #define PRINT_DEBUG_MESSAGES
 //#define PRINT_HTTP_RESPONSE
 
-//#define PRINT_HTTP_RESPONSE
-
-// Comentar/Descomentar para conexion Fuera/Dentro de UPV
-//#define WiFi_CONNECTION_UPV
-
-// Selecciona que servidor REST quieres utilizar entre ThingSpeak y Dweet
-//#define REST_SERVER_THINGSPEAK //Selecciona tu canal para ver los datos en la web (https://thingspeak.com/channels/360979)
-#define REST_SERVER_DWEET //Selecciona tu canal para ver los datos en la web (http://dweet.io/follow/PruebaGTI)
-
-
 bool conexion = false;
+
+#define WiFi_CONNECTION_UPV
 
 /*//////////////////////////////////////////////////////
 Comentar/Descomentar para conexion Fuera/Dentro de UPV
@@ -26,13 +18,13 @@ Comentar/Descomentar para conexion Fuera/Dentro de UPV
   const char WiFiSSID[] = "GTI1";
   const char WiFiPSK[] = "1PV.arduino.Toledo";
 #else //Conexion fuera de la UPV
-  const char WiFiSSID[] = "ADAMO-201D";
-  const char WiFiPSK[] = "ZBU4HWWTD36CBM";
+  const char WiFiSSID[] = "vodafone8DC8";
+  const char WiFiPSK[] = "R9";
 #endif
 /////////////////////////////////////////////////////*/
 
-  const char WiFiSSID[] = "ADAMO-201D";
-  const char WiFiPSK[] = "ZBU4HWWTD36CBM";
+  const char WiFiSSID[] = "GTI1";
+  const char WiFiPSK[] = "1PV.arduino.Toledo";
 
 /*//////////////////////////////////////////////////////
 Selecciona que servidor REST quieres utilizar entre ThingSpeak y Dweet
@@ -46,12 +38,11 @@ Selecciona que servidor REST quieres utilizar entre ThingSpeak y Dweet
 #elif defined(REST_SERVER_THINGSPEAK) //Conexion fuera de la UPV
   const char Server_Host[] = "api.thingspeak.com";
   const int Server_HttpPort = 80;
-#else
   const char Server_Host[] = "dweet.io";
   const int Server_HttpPort = 80;
 #endif
 /////////////////////////////////////////////////////*/
-
+#define REST_SERVER_DWEET //Selecciona tu canal para ver los datos en la web
   const char Server_Host[] = "dweet.io";
   const int Server_HttpPort = 80;
 
@@ -59,7 +50,7 @@ Selecciona que servidor REST quieres utilizar entre ThingSpeak y Dweet
 
 #ifdef REST_SERVER_THINGSPEAK
   const char Rest_Host[] = "api.thingspeak.com";
-  String MyWriteAPIKey="UAMQRNT5GNVRW13I"; // Escribe la clave de tu canal ThingSpeak
+  String MyWriteAPIKey="9"; // Escribe la clave de tu canal ThingSpeak
 #else
   const char Rest_Host[] = "dweet.io";
   String MyWriteAPIKey="cdiocurso2019g08"; // Escribe la clave de tu canal Dweet
@@ -69,8 +60,8 @@ Selecciona que servidor REST quieres utilizar entre ThingSpeak y Dweet
 
 /////////////////////////////////////////////////////*/
  
-const char Rest_Host[] = "dweet.io";
-String MyWriteAPIKey="cdiocurso2019g08"; // Escribe la clave de tu canal Dweet
+  const char Rest_Host[] = "dweet.io";
+  String MyWriteAPIKey="cdiocurso2019g08"; // Escribe la clave de tu canal Dweet
 #define NUM_FIELDS_TO_SEND 2 //Numero de medidas a enviar al servidor REST (Entre 1 y 8)
 
 WifiConnection::WifiConnection(){
@@ -122,7 +113,7 @@ void WifiConnection::HTTPPost(String fieldData, int numFields){
 
 // Esta funcion construye el string de datos a enviar a ThingSpeak mediante el metodo HTTP POST
 // La funcion envia "numFields" datos, del array fieldData.
-// Asegurate de ajustar numFields al n�mero adecuado de datos que necesitas enviar y activa los campos en tu canal web
+// Asegurate de ajustar numFields al numero adecuado de datos que necesitas enviar y activa los campos en tu canal web
 
     if (client.connect( Server_Host , Server_HttpPort )){
 
@@ -167,7 +158,7 @@ void WifiConnection::HTTPGet(String fieldData, int numFields){
 
 // Esta funcion construye el string de datos a enviar a ThingSpeak o Dweet mediante el metodo HTTP GET
 // La funcion envia "numFields" datos, del array fieldData.
-// Asegurate de ajustar "numFields" al n�mero adecuado de datos que necesitas enviar y activa los campos en tu canal web
+// Asegurate de ajustar "numFields" al numero adecuado de datos que necesitas enviar y activa los campos en tu canal web
 
     if (client.connect( Server_Host , Server_HttpPort )){
            #ifdef REST_SERVER_THINGSPEAK
@@ -205,9 +196,5 @@ void WifiConnection::HTTPGet(String fieldData, int numFields){
            #endif
     }
 }
-/*
-bool conectado(){
-  return conexion;
-}
-*/
+
 #endif /* WIFICONNECTION_H_ */

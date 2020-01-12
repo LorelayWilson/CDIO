@@ -18,6 +18,7 @@
 
 
 bool conexion = false;
+int cont = 0;
 
 /*//////////////////////////////////////////////////////
 Comentar/Descomentar para conexion Fuera/Dentro de UPV
@@ -62,7 +63,7 @@ Selecciona que servidor REST quieres utilizar entre ThingSpeak y Dweet
   String MyWriteAPIKey="UAMQRNT5GNVRW13I"; // Escribe la clave de tu canal ThingSpeak
 #else
   const char Rest_Host[] = "dweet.io";
-  String MyWriteAPIKey="cdiocurso2019g08"; // Escribe la clave de tu canal Dweet
+  String MyWriteAPIKey="cdiocurso2018g08"; // Escribe la clave de tu canal Dweet
 #endif
 
 #define NUM_FIELDS_TO_SEND 2 //Numero de medidas a enviar al servidor REST (Entre 1 y 8)
@@ -70,7 +71,7 @@ Selecciona que servidor REST quieres utilizar entre ThingSpeak y Dweet
 /////////////////////////////////////////////////////*/
  
 const char Rest_Host[] = "dweet.io";
-String MyWriteAPIKey="cdiocurso2019g08"; // Escribe la clave de tu canal Dweet
+String MyWriteAPIKey="cdiocurso2018g08"; // Escribe la clave de tu canal Dweet
 #define NUM_FIELDS_TO_SEND 2 //Numero de medidas a enviar al servidor REST (Entre 1 y 8)
 
 WifiConnection::WifiConnection(){
@@ -80,8 +81,7 @@ WifiConnection::WifiConnection(){
 /////////////// WiFi Connection ////////////////
 //////////////////////////////////////////////////////
 
-void WifiConnection::connectWiFi()
-{
+void WifiConnection::connectWiFi(){
   byte ledStatus = LOW;
 
   #ifdef PRINT_DEBUG_MESSAGES

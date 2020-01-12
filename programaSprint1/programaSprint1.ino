@@ -4,6 +4,7 @@
 #include "Sensor.h"
 //#include "Gps.h"
 #include "IdentificarPersonas.h"
+#include "WifiConnection.h"
 #include <EEPROM.h>
 #include <Adafruit_ADS1015.h>
 #include <TinyGPS++.h>  //Librería del GPS
@@ -20,18 +21,18 @@
   //CONSTANTES SENSOR HUMEDAD
   const double AIR_VALUE = 20200;  // Medimos valor minimo de humedad (valor en seco)
   const double WATER_VALUE = 10250;  // Medimos valor maximo de humedad (valor en agua)
-  const int ADCH = 0;  // Pin de entrada analogica para sensor humedad
+  const int ADCH = 2;  // Pin de entrada analogica para sensor humedad
  
   //CONSTANTES SENSOR SALINIDAD
   const double MIN_SALINIDAD = 3111; //Valor de la medida del sensor en agua destilada sin nada
   const double MAX_SALINIDAD = 22873; //Valor de la medida del sensor en agua destilada con la máxima cantidad de sal
-  const int ADCS = 1;  // Pin de entrada analogica para sensor salinidad
+  const int ADCS = 0;  // Pin de entrada analogica para sensor salinidad
   const int PIN_SAL = 5; // Pin I/O digital para salinidad
   
   //CONSTANTES SENSOR TEMPERATURA
   const double B  = 790;  //ordenada en el origen
   const double M = 34.9; //  pendiente_calibrado
-  const int ADCT = 2;  // Pin de entrada analogica para sensor temperatura
+  const int ADCT = 1;  // Pin de entrada analogica para sensor temperatura
 
   //CONSTANTES SENSOR LUZ
   const int ADCL = 3;  //Pin de entrada analógica para el sensor de salinidad
@@ -52,6 +53,8 @@
   int multiplo=1;
   int numOfInterrupts=0;
   volatile byte interruptCounter=0;
+
+  WifiConnection wifi;
   
 /****************************************************************************************************************************************
  *ACELEROMETRO
@@ -117,8 +120,6 @@ void configurarAcelerometro(){
    // Configurar acelerometro
    I2CwriteByte(MPU9250_ADDRESS, 28, ACC_FULL_SCALE_16_G);
 
-   //Configurar giroscopio
-   I2CwriteByte(MPU9250_ADDRESS, 27, GYRO_FULL_SCALE_2000_DPS);
 
    //*ESTO ES LA TABLA QUE HEMOS HECHO*
    I2CwriteByte(MPU9250_ADDRESS, PWR_MGMT_1, 0);
@@ -131,7 +132,6 @@ void configurarAcelerometro(){
    I2CwriteByte(MPU9250_ADDRESS,WOM_THR ,2 ); 
    I2CwriteByte(MPU9250_ADDRESS, PWR_MGMT_1, 32); 
 
-   // Configurar interrupcion
    pinMode(interruptPin, INPUT_PULLUP);
    attachInterrupt(digitalPinToInterrupt(interruptPin), interrupcion , CHANGE);
 }
@@ -323,7 +323,7 @@ void menuSensores(){
             break;
           case 4:
             lectura = ads1115.readADC_SingleEnded(ADCH);
-            medirHumedad(AIR_VALUE, WATER_VALUE, lectura);
+            mostrarHumedad(AIR_VALUE, WATER_VALUE, lectura);
             flag = true;
             break;
           case 5:
@@ -332,19 +332,19 @@ void menuSensores(){
             lectura = ads1115.readADC_SingleEnded(ADCS);
             digitalWrite(PIN_SAL, LOW);
             delay(10);
-            medirSalinidad(MIN_SALINIDAD, MAX_SALINIDAD, lectura);
+            mostrarSalinidad(MIN_SALINIDAD, MAX_SALINIDAD, lectura);
             flag = true;
             break;
           
           case 6:
             lectura = ads1115.readADC_SingleEnded(ADCT);
-            medirTemperatura(B, M, lectura);
+            mostrarTemperatura(B, M, lectura);
             flag = true;
             break;
             
           case 7:
             lectura = ads1115.readADC_SingleEnded(ADCL);
-            medirLuz(MAX_LUZ, MIN_LUZ, lectura);
+            mostrarLuz(MAX_LUZ, MIN_LUZ, lectura);
             flag = true;
             break;
 
@@ -412,6 +412,7 @@ void setup() {
   flag = true;
   configurarAcelerometro();
   configurarGps();
+//  wifi.connectWiFi();
   if (comprobarInicializacion() == false) {
     inicializarMemoriaEEPROM();
   }
@@ -420,14 +421,30 @@ void setup() {
 /****************************************************************************************************************************************
  *FUNCION MAIN
  ****************************************************************************************************************************************/
+
+const int NUMBER = 7;
 //Función loop donde se llamará a las funciones de los sensores
 void loop() {
-
+Serial.
+  String data[NUMBER+1];
   menuSensores();
 
   /*if(interruptCounter>0)
     Serial.println("es mayor");
   Serial.println(numOfInterrupts);
   lecturaAcelerometro();*/
+
+int16_t lectura;
+lectura = ads1115.readADC_SingleEnded(ADCH);
+int16_t humedad =getHumedad(AIR_VALUE, WATER_VALUE, lectura);
+data [1] = String (humedad);
+data [2] = String (humedad);
+#ifdef PRINT_DEBUG_MESSAGES
+  Serial.print("Humedad = ");
+  Serial.printl(data[1]);
+#endif
+
+//wifi.HTTPGet(data, NUMBER);
+  
   delay (5000);
 }
