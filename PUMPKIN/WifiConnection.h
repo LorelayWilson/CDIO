@@ -1,4 +1,4 @@
-/*#ifndef WIFICONNECTION_H
+#ifndef WIFICONNECTION_H
 #define WIFICONNECTION_H
 
 #include <ESP8266WiFi.h>
@@ -16,10 +16,9 @@ class WifiConnection {
 		WifiConnection();
 	    void connectWiFi();
 	    bool conexion = false;
-	    //bool conectado();
 	    void HTTPPost(String, int);
 	    void HTTPGet(String, int);
 
 };
 
-#endif*/
+#endif
