@@ -28,13 +28,16 @@ void mostrarHumedad(int airValue, int waterValue, int16_t adc) {
   if(adc < waterValue){
 	    Serial.print("La humedad es: ");
 	    Serial.println("100 %");
+      
 	} else if (airValue > adc){
 	    Serial.print("La humedad es: ");
 	    Serial.println("0 %");
+      
 	} else{
 	    Serial.print("La humedad es: ");
 	    Serial.print(humedad);
 	    Serial.println(" %");
+    
 	}
 }
 
