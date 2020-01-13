@@ -1,7 +1,8 @@
-
+/*
 #include "Gps.h"
+//#include <TinyGPS++.h>
 
-TinyGPSPlus gps; // Definimos el objeto gps
+//TinyGPSPlus gps; // Definimos el objeto gps
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //                                     FUNCIONES                                       //
@@ -81,4 +82,4 @@ void mostrarGps(SoftwareSerial ss) {
   }
   
   smartDelay(1000, ss);
-}//()
+}//()*/
