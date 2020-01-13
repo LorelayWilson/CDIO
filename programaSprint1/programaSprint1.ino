@@ -720,7 +720,9 @@ void menuSensores() {
     Función que se produce una sola vez para ajustar lo que necesitemos en el programa
 */
 void setup() {
+
   Serial.begin(9600); //Establecemos la velocidad de datos en 9600 baudios
+
   ads1115.begin(); //Inicializamos el ADS1115
   ads1115.setGain(GAIN_ONE); //Ajustamos la ganancia a +/- 4.096V
   EEPROM.begin(512); //Inicializamos la memoria EEPROM
