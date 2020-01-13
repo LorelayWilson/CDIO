@@ -1,4 +1,4 @@
-#ifndef WIFICONNECTION_H
+/*#ifndef WIFICONNECTION_H
 #define WIFICONNECTION_H
 
 #include <ESP8266WiFi.h>
@@ -22,4 +22,4 @@ class WifiConnection {
 
 };
 
-#endif
+#endif*/

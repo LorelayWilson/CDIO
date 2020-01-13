@@ -1,4 +1,4 @@
-#ifndef WIFICONNECTION_H_
+/*#ifndef WIFICONNECTION_H_
 #define WIFICONNECTION_H_
 
 #include "WifiConnection.h"
@@ -18,7 +18,7 @@
 
 
 bool conexion = false;
-int cont = 0;
+int cont = 0;*/
 
 /*//////////////////////////////////////////////////////
 Comentar/Descomentar para conexion Fuera/Dentro de UPV
@@ -70,18 +70,18 @@ Selecciona que servidor REST quieres utilizar entre ThingSpeak y Dweet
 
 /////////////////////////////////////////////////////*/
  
-const char Rest_Host[] = "dweet.io";
+/*const char Rest_Host[] = "dweet.io";
 String MyWriteAPIKey="cdiocurso2018g08"; // Escribe la clave de tu canal Dweet
 #define NUM_FIELDS_TO_SEND 2 //Numero de medidas a enviar al servidor REST (Entre 1 y 8)
 
 WifiConnection::WifiConnection(){
-}
+}*/
 
 /////////////////////////////////////////////////////
 /////////////// WiFi Connection ////////////////
 //////////////////////////////////////////////////////
 
-void WifiConnection::connectWiFi(){
+/*void WifiConnection::connectWiFi(){
   byte ledStatus = LOW;
 
   #ifdef PRINT_DEBUG_MESSAGES
@@ -112,29 +112,29 @@ void WifiConnection::connectWiFi(){
      Serial.println(WiFi.localIP()); // Print the IP address
      conexion = true;
   #endif
-}
+}*/
 
 /////////////////////////////////////////////////////
 /////////////// HTTP POST  ThingSpeak////////////////
 //////////////////////////////////////////////////////
 
-void WifiConnection::HTTPPost(String fieldData, int numFields){
+//void WifiConnection::HTTPPost(String fieldData, int numFields){
 
 // Esta funcion construye el string de datos a enviar a ThingSpeak mediante el metodo HTTP POST
 // La funcion envia "numFields" datos, del array fieldData.
 // Asegurate de ajustar numFields al n�mero adecuado de datos que necesitas enviar y activa los campos en tu canal web
 
-    if (client.connect( Server_Host , Server_HttpPort )){
+   /* if (client.connect( Server_Host , Server_HttpPort )){
 
         // Construimos el string de datos. Si tienes multiples campos asegurate de no pasarte de 1440 caracteres
 
         String PostData= "api_key=" + MyWriteAPIKey ;
         for ( int field = 1; field < (numFields + 1); field++ ){
             PostData += "&field" + String( field ) + "=" + fieldData[ field ];
-        }
+        }*/
 
         // POST data via HTTP
-        #ifdef PRINT_DEBUG_MESSAGES
+       /* #ifdef PRINT_DEBUG_MESSAGES
             Serial.println( "Connecting to ThingSpeak for update..." );
         #endif
         client.println( "POST http://" + String(Rest_Host) + "/update HTTP/1.1" );
@@ -157,19 +157,19 @@ void WifiConnection::HTTPPost(String fieldData, int numFields){
             #endif
         #endif
     }
-}
+}*/
 
 ////////////////////////////////////////////////////
 /////////////// HTTP GET  ////////////////
 //////////////////////////////////////////////////////
 
-void WifiConnection::HTTPGet(String fieldData, int numFields){
+//void WifiConnection::HTTPGet(String fieldData, int numFields){
 
 // Esta funcion construye el string de datos a enviar a ThingSpeak o Dweet mediante el metodo HTTP GET
 // La funcion envia "numFields" datos, del array fieldData.
 // Asegurate de ajustar "numFields" al n�mero adecuado de datos que necesitas enviar y activa los campos en tu canal web
 
-    if (client.connect( Server_Host , Server_HttpPort )){
+    /*if (client.connect( Server_Host , Server_HttpPort )){
            #ifdef REST_SERVER_THINGSPEAK
               String PostData= "GET https://api.thingspeak.com/update?api_key=";
               PostData= PostData + MyWriteAPIKey ;
@@ -204,10 +204,10 @@ void WifiConnection::HTTPGet(String fieldData, int numFields){
               #endif
            #endif
     }
-}
+}*/
 /*
 bool conectado(){
   return conexion;
 }
 */
-#endif /* WIFICONNECTION_H_ */
+//#endif /* WIFICONNECTION_H_ */
